@@ -1,0 +1,51 @@
+name: Cucumber + Playwright Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run login scenario (saves auth.json)
+        run: npm test -- --tags @authentication
+        env:
+          LOGIN_URL:       ${{ secrets.LOGIN_URL }}
+          BASE_URL_DOMAIN: ${{ secrets.BASE_URL_DOMAIN }}
+          TEST_USERNAME:   ${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD:   ${{ secrets.TEST_PASSWORD }}
+          AUTH_FILE_PATH:  auth.json
+          MFA_WAIT_MS:     60000
+          HEADLESS:        "true"
+
+      - name: Run supplier tests
+        run: npm test -- --tags @supplier
+        env:
+          BASE_URL_DOMAIN: ${{ secrets.BASE_URL_DOMAIN }}
+          AUTH_FILE_PATH:  auth.json
+          HEADLESS:        "true"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: cucumber-report
+          path: reports/
+          retention-days: 30

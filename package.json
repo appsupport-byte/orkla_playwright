@@ -1,0 +1,24 @@
+{
+  "name": "orkla-automation",
+  "version": "1.0.0",
+  "description": "Cucumber BDD test framework for Orkla-Automation using Playwright (no bddgen, no output directory)",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:headed": "HEADLESS=false cucumber-js",
+    "test:login": "cucumber-js --tags @authentication",
+    "test:supplier": "cucumber-js --tags @supplier",
+    "test:dry": "cucumber-js --dry-run",
+    "report": "open reports/cucumber-report.html"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.8.0",
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.14.0",
+    "playwright": "^1.44.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
