@@ -18,7 +18,8 @@ const common = {
     'tests/stepDefinition/**/*.ts',
   ],
 
-  requireModule: ['ts-node/register'],
+  //requireModule: ['ts-node/register'],
+  requireModule: ['ts-node/register', 'tsconfig-paths/register'],
 
   // Output: progress in terminal + HTML + JSON for CI/reporting
   format: [

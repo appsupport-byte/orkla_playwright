@@ -43,6 +43,7 @@ export class SupplierPage {
         PURCHASING_DEMOGRAPHICS_TAB: ['button[aria-label="Purchasing demographics"]', 'button:has-text("Purchasing demographics")'],
         CURRENCY_INPUT: ['input[id*="Currency_Currency_input"]'],
         MAIN_CONTACT_WORKER_INPUT: ['input[aria-labelledby*="MainContactWorker"]'],
+        MAIN_CONTACT_WORKER_Select: ['//span[@id="HcmWorkerLookUp_8_OK_label"]'],
         VAT_NUMBER_LOOKUP: ['select[aria-labelledby*="SalesTax_VATNum"]', 'input[aria-labelledby*="SalesTax_VATNum"]'],
 
         // Purchase Order Defaults Section
@@ -51,6 +52,10 @@ export class SupplierPage {
         ////*[@id="vendtablelistpage_7_PurchPoolId_input"]
         PAYMENT_TERM_INPUT: ['input[id*="Payment_PaymTermId_input"]'],
         DELIVERY_TERM_INPUT: ['input[id*="Delivery_DlvTerm_input"]'],
+
+        // Tax Exempt Number Section
+        TAX_EXEMPT_NUMBER_DROPDOWN_BUTTON: ['//*[@id="vendtablelistpage_1_SalesTax_VATNum"]/div/div'],
+
 
         // VAT Number Table
         VAT_TABLE_NEW_BUTTON: ['button[id*="TaxVATNumTable_"][id*="SystemDefinedNewButton"]'],
@@ -169,7 +174,9 @@ export class SupplierPage {
     get mainContactWorkerInput(): Locator {
         return PageUtil.getFirstMatchingLocator(this.page, [...this.SELECTORS.MAIN_CONTACT_WORKER_INPUT]);
     }
-
+    get mainContactWorkerSelect(): Locator {
+        return PageUtil.getFirstMatchingLocator(this.page, [...this.SELECTORS.MAIN_CONTACT_WORKER_Select]);
+    }
     get vatNumberLookup(): Locator {
         return PageUtil.getFirstMatchingLocator(this.page, [...this.SELECTORS.VAT_NUMBER_LOOKUP]);
     }
@@ -180,7 +187,7 @@ export class SupplierPage {
     }
 
     get purchasePoolInput(): Locator {
-        return PageUtil.getFirstMatchingLocator(this.page, ['input[title="PO Conf"]']);
+        return PageUtil.getFirstMatchingLocator(this.page, ['//input[@id="vendtablelistpage_1_PurchPoolId_input"]']);
     }
 
     get paymentTermInput(): Locator {
@@ -230,6 +237,11 @@ export class SupplierPage {
         return PageUtil.getFirstMatchingLocator(this.page, ['button[name="EditContactInfo"]', 'button:has-text("Edit Contact Info")']);
     }
 
+    get addressCountryRegionIDDropdown(): Locator {
+        return PageUtil.getFirstMatchingLocator(this.page, ['input[value="DEU"]']);
+    }
+
+
     // ─── Navigation ───────────────────────────────────────────────────────────
 
     /**
@@ -262,6 +274,7 @@ export class SupplierPage {
      */
     async clickSave(): Promise<void> {
         await PageUtil.clickElementButtonName(this.saveButton, 'Save');
+        await PageUtil.waitForD365Loading(this.waitForD365Loading);
     }
 
     // ─── General Section ──────────────────────────────────────────────────────
@@ -312,6 +325,7 @@ export class SupplierPage {
 
     async clickNewAddress(): Promise<void> {
         await PageUtil.clickElement(this.newAddressButton, 'New Address button');
+        await PageUtil.waitForD365Loading(this.waitForD365Loading);
     }
 
     async fillAddressDescription(description: string): Promise<void> {
@@ -327,7 +341,13 @@ export class SupplierPage {
 
     async selectCountryRegion(country: string): Promise<void> {
 
-        await PageUtil.fillInput(this.countryRegionInput, country, 'Country Region');
+        //await PageUtil.clickElement(this.addressCountryRegionIDDropdown, 'Country Region input');
+        //await PageUtil.fillInputAfterDeletingPriorValue(this.countryRegionInput, country, 'Country Region');
+        const ValueLocator = PageUtil.getFirstMatchingLocator(this.page, [`//input[@value="${country}"]`]);
+        await PageUtil.lookupSelectWithIcon(this.countryRegionInput, ValueLocator, country, 0);
+
+
+
     }
 
     async fillZipCode(zipCode: string): Promise<void> {
@@ -402,7 +422,11 @@ export class SupplierPage {
     }
 
     async selectMainContactWorker(worker: string): Promise<void> {
-        await PageUtil.fillAndPressKey(this.mainContactWorkerInput, worker, 'Enter', 'Main Contact Worker');
+        await PageUtil.fillInput(this.mainContactWorkerInput, worker, 'Main Contact Worker');
+        await PageUtil.PressKey(this.mainContactWorkerInput, 'Alt+Enter');
+        // await PageUtil.assertElementVisible(this.mainContactWorkerSelect, ENV.PAGE_LOAD_TIMEOUT);
+        // await PageUtil.clickElement(this.mainContactWorkerSelect, 'Main Contact Worker select option');
+
     }
 
     async openVatNumberDetails(): Promise<void> {
@@ -417,7 +441,7 @@ export class SupplierPage {
     }
 
     async selectPurchasePool(pool: string): Promise<void> {
-        await PageUtil.fillAndPressKey(this.purchasePoolInput, pool, 'Enter', 'Purchase Pool');
+        await PageUtil.fillInput(this.purchasePoolInput, pool, 'Purchase Pool');
     }
 
     async selectPaymentTerm(term: string): Promise<void> {

@@ -26,35 +26,26 @@ Feature: Create Suppliers in Orkla Operations
       | ZipCode_label         | <ZipCode>    |
       | Street_label          | <Street>     |
       | City_label            | <City>       |
-
-    And I set the contact role to Business for all contact types
-    And I expand the Purchasing demographics tab
-    And I fill in the Purchasing Demographics section with:
-      | Field                   | Value           |
-      | Currency_Currency_input | <Currency>      |
-      | MainContactWorker       | <ContactWorker> |
-
     And I expand the Contact information tab
     And I fill in the Contact Information section with:
       | Field                   | Value         |
       | ContactInfo_Description | <ContactName> |
       | ContactInfo_Type        | Email Address |
       | ContactInfo_Locator     | <Email>       |
+    #And I set the contact role to Business for all contact types
 
-    And I expand the Purchase order defaults tab
     And I fill in the Purchase Order Defaults section with:
       | Field                    | Value          |
       | PurchPoolId_label        | <PurchasePool> |
       | Payment_PaymTermId_input | <PaymentTerm>  |
       | Delivery_DlvTerm_input   | <DeliveryTerm> |
+    And I expand the Purchasing demographics tab
+    And I fill in the Purchasing Demographics section with:
+      | Field                   | Value           |
+      | Currency_Currency_input | <Currency>      |
+      | MainContactWorker       | <ContactWorker> |
 
-    And I add VAT Number with:
-      | Field                          | Value        |
-      | TaxVATNumTable_CountryRegionId | <Country>    |
-      | TaxVATNumTable_VATNum          | <VendorName> |
-
-
-
+    #And I expand the Purchase order defaults tab
     When I save the supplier record
     Then the supplier is created successfully
     #Then a new supplier ID is generated automatically

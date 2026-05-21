@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2021",
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
@@ -9,14 +9,37 @@
     "rootDir": "./",
     "baseUrl": ".",
     "paths": {
-      "@config/*": ["tests/config/*"],
-      "@pages/*":  ["tests/pages/*"],
-      "@utils/*":  ["tests/utils/*"],
-      "@hooks/*":  ["tests/hooks/*"],
-      "@types/*":  ["tests/types/*"],
-      "@support/*":["tests/support/*"]
-    }
+      "@config/*": [
+        "tests/config/*"
+      ],
+      "@pages/*": [
+        "tests/pages/*"
+      ],
+      "@utils/*": [
+        "tests/utils/*"
+      ],
+      "@hooks/*": [
+        "tests/hooks/*"
+      ],
+      "@types/*": [
+        "tests/types/*"
+      ],
+      "@support/*": [
+        "tests/support/*"
+      ]
+    },
+    "lib": [
+      "ES2021",
+      "DOM"
+    ]
   },
-  "include": ["tests/**/*.ts", "cucumber.js"],
-  "exclude": ["node_modules", "dist", "reports"]
+  "include": [
+    "tests/**/*.ts",
+    "cucumber.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "reports"
+  ]
 }

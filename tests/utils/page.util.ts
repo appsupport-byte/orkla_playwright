@@ -69,6 +69,21 @@ export class PageUtil {
       Logger.error('D365 loading did not complete within expected time');
     }
   }
+  static async waitForD365Loading_new(locator: Locator): Promise<void> {
+    Logger.info('Waiting for D365 loading to complete...');
+    try {
+      // Wait a brief moment for D365 to show the overlay
+      await locator.page().waitForTimeout(300);
+      // Only wait for hidden if the overlay actually appeared
+      const isVisible = await locator.isVisible().catch(() => false);
+      if (isVisible) {
+        await locator.waitFor({ state: 'hidden', timeout: ENV.PAGE_LOAD_TIMEOUT });
+      }
+      Logger.success('D365 loading completed');
+    } catch {
+      Logger.error('D365 loading did not complete within expected time');
+    }
+  }
 
   static async fillInput(locator: Locator, value: string, label: string): Promise<void> {
     Logger.step(`Filling "${label}" with value`);
@@ -81,10 +96,35 @@ export class PageUtil {
       await locator.press('Control+A');
       await locator.press('Delete');
       await locator.pressSequentially(value, { delay: 50 });
+
       // await locator.press('Enter');
     }
     else {
       await locator.fill(value);
+      await locator.page().waitForTimeout(2000);
+    }
+    //await expect(locator).toHaveValue(value);
+    //Logger.success(`"${label}" field filled and verified`);
+  }
+  static async fillInputAfterDeletingPriorValue(locator: Locator, value: string, label: string): Promise<void> {
+    Logger.step(`Filling "${label}" with value`);
+    await expect(locator).toBeVisible({ timeout: ENV.ELEMENT_TIMEOUT_MS });
+
+    const isReadonly = await locator.getAttribute('readonly');
+    console.log(`Locator for "${label}" is readonly: ${isReadonly}`);
+    await this.clickElement(locator, label);
+    if (!isReadonly) {
+      await locator.press('Control+A');
+      await locator.press('Delete');
+      await locator.fill(value);
+      await locator.page().waitForTimeout(2000);
+      //await locator.pressSequentially(value, { delay: 50 });
+      // await locator.press('Enter');
+    }
+    else {
+
+      await locator.click();
+      await locator.clear();
       await locator.page().waitForTimeout(2000);
     }
     //await expect(locator).toHaveValue(value);
@@ -201,4 +241,27 @@ export class PageUtil {
     Logger.info(`Waiting ${ms}ms — ${reason}`);
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
+  static async lookupSelectWithIcon(fieldSelector: Locator, valueLocator: Locator, value: string, step: number = 0) {
+
+    await fieldSelector.evaluate(node => {
+      (node.nextElementSibling as HTMLElement)?.click();
+    });
+
+    await fieldSelector.page().waitForTimeout(1000);
+
+    await fieldSelector.click();
+
+    if ((await fieldSelector.inputValue()).trim()) {
+      await fieldSelector.press('Control+A');
+      await fieldSelector.press('Backspace');
+    }
+
+    await fieldSelector.page().keyboard.type(value, { delay: 1000 });
+    await fieldSelector.page().waitForTimeout(1000);
+    await valueLocator.waitFor({ state: 'visible' });
+    await valueLocator.scrollIntoViewIfNeeded();
+    await valueLocator.focus();
+    await valueLocator.press('Enter');
+  }
+
 }
